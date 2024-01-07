@@ -1,0 +1,210 @@
+---
+title: "Projecte estadística"
+author: "Martí Ortega (1637970) i Aina Setó (1637497)"
+date: "2024-12-23"
+output: word_document
+---
+
+#EXPLICAR KLK EL TREBALL EN QUE CONSISTEIX I TAL
+
+```{r}
+library("readxl")
+pinguins <- read_excel("/Users/aina/Desktop/uni/3r/1r_semestre/estadística/projecte/pinguins.xlsx")
+
+#Mostrem el dataset i un resum
+head(pinguins)
+summary(pinguins)
+```
+
+**Anàlisis dataset**
+
+El nostre dataset conté 7 variables, les variables espècie i illa son variables qualitatives. Per contra, l'allargada del bec, la profunditat del bec, l'allargada de de l'aleta i la massa corporal són variables qualitatives.
+
+#EXPLICAR KLK MILLOR EL DATASET
+
+**Gràfic de barres de la distribució d'espècies**
+```{r}
+library(ggplot2)
+ggplot(pinguins, aes(x = species, fill = species)) +
+  geom_bar() +
+  labs(title = "Distribució d'espècies",
+       x = "Espècie",
+       y = "Freqüència")
+```
+
+Podem veure que hi han aproximadament 113 pinguins de l'espècie Adelie i uns 100 pinguins de l'espècies Gentoo.
+
+Guardem en variables cada columna
+```{r}
+#Guardem cada variable en un vector
+especies <- pinguins$species
+especies <- as.numeric(especies == "Adelie")
+bec_llargada <- pinguins$bill_length_mm
+bec_profunditat <- pinguins$bill_depth_mm
+aleta_llargada <- pinguins$flipper_length_mm
+massa_corporal <- pinguins$body_mass_g
+```
+
+## Model regressió lineal múltiple
+Fem la regressió lineal múltiple amb 4 variables, en el nostre cas escollim les variables allargada del bec, profunditat del bec, allargada de de l'aleta i la massa corporal en funció de l'espècie. Per poder poder fer la regressió amb l'espècie els pinguins Adelie els codifiquem com a 1 i els Gentoo com a 0.
+```{r}
+model <- lm(especies ~ bec_llargada + bec_profunditat + aleta_llargada + massa_corporal)
+```
+#EXPLICAR KLK EL MODEL
+
+**Avaluació global**
+```{r}
+anova(model, test = "Chisq")
+```
+#EXPLICAR AVALUACIÓ GLOBAL
+
+**Avaluació individual**
+```{r}
+coef(summary(model))
+```
+#EXPLICAR AVALUACIÓ INDIVIDUAL
+
+**Matriu de coovariàncies i variànices**
+```{r}
+penguins_matriu <- data.frame(especies = especies, bec_llargada = bec_llargada, bec_profunditat=bec_profunditat, aleta_llargada = aleta_llargada, massa_corporal = massa_corporal)
+matriu_covariancies <- cov(penguins_matriu)
+matriu_covariancies
+
+variancies <- diag(matriu_covariancies)
+variancies
+```
+#EXPLICAR MATRIUS
+
+**Residuals**
+```{r}
+residuals <- residuals(model)
+print(head(residuals, 5))
+qqnorm(residuals)
+qqline(residuals)
+```
+#EXPLICAR RESIDUALS
+
+**Prediccions**
+```{r}
+library(readxl)
+pinguins_test <- read_excel("/Users/aina/Desktop/uni/3r/1r_semestre/estadística/projecte/pinguins_test.xlsx")
+
+#Guardem cada variable en un vector
+especies_t <- pinguins_test$species
+especies_t <- as.numeric(especies_t == "Adelie")
+bec_llargada_t <- pinguins_test$bill_length_mm
+bec_profunditat_t <- pinguins_test$bill_depth_mm
+aleta_llargada_t <- pinguins_test$flipper_length_mm
+massa_corporal_t <- pinguins_test$body_mass_g
+dataset_test <- data.frame(especies = especies_t, bec_llargada = bec_llargada_t, bec_profunditat=bec_profunditat_t, aleta_llargada = aleta_llargada_t, massa_corporal = massa_corporal_t)
+
+#Fer les prediccions
+prediccions <- predict(model, dataset_test, type = "response")
+prediccions_binarias <- as.numeric(prediccions > 0.5)
+prediccions_binarias
+```
+#EXPLICAR PREDICCIONS
+
+**Intèrvals de confiança**
+```{r}
+#Intèrval de confiança
+interval_confiança <- confint(model)
+print(head(interval_confiança, 5))
+
+#Intèrval de confiança per les dades de test
+prediccions_amb_interval <- predict(model, dataset_test, type = "response", interval = "confidence")
+print(head(prediccions_amb_interval, 5))
+```
+#EXPLICAR INTÈRVALS
+
+**Model restringit**
+#- Perquè agafem aquestes variables?
+```{r}
+model_restringit <- lm(especies ~ bec_llargada + aleta_llargada + massa_corporal)
+anova(model_restringit, model, test = "Chisq")
+```
+#EXPLICAR ANOVA 
+
+##Model regressió logística de Poisson
+Model regressió logística de Poission Fem la regressió logística de Poission amb 3 variables, en el nostre cas escollim les variables allargada del bec, allargada de de l'aleta i la massa corporal en funció de l'espècie.
+```{r}
+model2 <- glm(especies ~ bec_llargada + aleta_llargada + massa_corporal, family = "poisson")
+```
+#EXPLICAR model klk 
+
+**Avaluació global**
+```{r}
+anova(model2, test = "Chisq")
+```
+#EXPLICAR AVALUACIÓ GLOBAL
+
+**Avaluació individual**
+```{r}
+coef(summary(model2))
+```
+#EXPLICAR AVALUACIÓ INDIVIDUAL
+
+**Matriu de coovariàncies i variànices**
+```{r}
+penguins_matriu <- data.frame(especies = especies, bec_llargada = bec_llargada, aleta_llargada = aleta_llargada, massa_corporal = massa_corporal)
+matriu_covariancies <- cov(penguins_matriu)
+matriu_covariancies
+
+variancies <- diag(matriu_covariancies)
+variancies
+```
+#EXPLICAR MATRIUS
+
+**Residuals**
+```{r}
+residuals <- residuals(model2)
+print(head(residuals, 5))
+qqnorm(residuals)
+qqline(residuals)
+```
+#EXPLICAR RESIDUALS
+
+**Prediccions**
+```{r}
+library(readxl)
+pinguins_test <- read_excel("/Users/aina/Desktop/uni/3r/1r_semestre/estadística/projecte/pinguins_test.xlsx")
+
+#Guardem cada variable en un vector
+especies_t <- pinguins_test$species
+especies_t <- as.numeric(especies_t == "Adelie")
+bec_llargada_t <- pinguins_test$bill_length_mm
+bec_profunditat_t <- pinguins_test$bill_depth_mm
+aleta_llargada_t <- pinguins_test$flipper_length_mm
+massa_corporal_t <- pinguins_test$body_mass_g
+dataset_test <- data.frame(especies = especies_t, bec_llargada = bec_llargada_t, bec_profunditat=bec_profunditat_t, aleta_llargada = aleta_llargada_t, massa_corporal = massa_corporal_t)
+
+#Fer les prediccions
+prediccions <- predict(model2, dataset_test, type = "response")
+prediccions_binarias <- as.numeric(prediccions > 0.5)
+prediccions_binarias
+```
+#EXPLICAR PREDICCIONS
+
+## Model regressió logística binomial
+Fem la regressió lineal múltiple amb 3 variables, l'allargada de l'aleta, la massa corporal i l'espècie.
+```{r}
+#Fem el model
+model3 <- glm(especies ~  aleta_llargada + massa_corporal, family = "binomial")
+summary(model3)
+```
+#EXPLICAR MODEL
+
+**ANOVA**
+```{r}
+anova <- anova(model3)
+summary(anova)
+```
+#EXPLICAR ANOVA
+
+**Blocs**
+```{r}
+#que coño son els blocs? xd
+```
+#EXPLICAR BLOCS XD
+
+
