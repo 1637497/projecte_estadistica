@@ -18,9 +18,16 @@ summary(pinguins)
 
 **Anàlisis dataset**
 
+El nostre conjunt de dades es centra en el fascinant regne dels pingüins, proporcionant una visió detallada d'un parell d'espècies, diverses illes i diferents carcterístiques físiques dels pingüins. Aquestes dades han estat extretes de ......... 
+
+El dataset conté 2 espècies diferents de pingüins: Adelie i Gentoo.
+La primera espècie va ser descoberta al 1830 per l'explorador francés Dumont D'Urville i va ser bautitzada en honor a la seva esposa Adelie. Aquests pingüins poden arribar a una profunditat de 175 metres quan quan bussegen i s'alimenten principalment de krill.
+Els pingüins Gentoo també coneguts com a pingüíns de corona blanca són fàcilment identificables perquè tenen una mena de taca blanca a la part superior del cap darrere dels ulls i són coneguts per ser els pingüins més ràpids sota l'aigua, arribant als 36 km/h. També són la tercera espècie més gran del món per sota dels famosos pingüins reis i pingüins emperadors.
+
+Les illes que apareixen en el conjunt de dades són les Torgersen, les Biscoe i les Dream. Les tres illes es troben a la costa occidental de la península Antàrtica, lleument al nord del cercle polar antàrtic.
+
 El nostre dataset conté 7 variables, les variables espècie i illa son variables qualitatives. Per contra, l'allargada del bec, la profunditat del bec, l'allargada de de l'aleta i la massa corporal són variables qualitatives.
 
-#EXPLICAR KLK MILLOR EL DATASET
 
 **Gràfic de barres de la distribució d'espècies**
 ```{r}
