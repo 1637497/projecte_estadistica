@@ -6,6 +6,10 @@ output: word_document
 ---
 
 #EXPLICAR KLK EL TREBALL EN QUE CONSISTEIX I TAL
+Aquest treball consisteix en aplicar els conceptes d'estadística donats a classe sobre conjunts de dades reals.
+Podem distingir 3 parts: Estimar un model de regressió lineal múltiple, estimar el model per mitjà de regressió logística i de Poisson, ANOVA i disseny de blocs complets.
+
+
 
 ```{r}
 library("readxl")
