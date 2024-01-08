@@ -32,7 +32,7 @@ ggplot(pinguins, aes(x = species, fill = species)) +
        y = "Freqüència")
 ```
 
-Podem veure que hi han aproximadament 113 pinguins de l'espècie Adelie i uns 100 pinguins de l'espècies Gentoo.
+Podem veure que hi ha aproximadament 113 pinguins de l'espècie Adelie i uns 100 pinguins de l'espècies Gentoo.
 
 Guardem en variables cada columna
 ```{r}
