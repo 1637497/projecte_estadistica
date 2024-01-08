@@ -1,7 +1,7 @@
 ---
 title: "Projecte estadística"
 author: "Martí Ortega (1637970) i Aina Setó (1637497)"
-date: "2024-12-23"
+date: "2023-12-23"
 output: word_document
 ---
 
