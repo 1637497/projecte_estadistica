@@ -12,12 +12,12 @@ Podem distingir 3 parts: Estimar un model de regressió lineal múltiple, estima
 
 
 ```{r}
-library("readxl")
-pinguins <- read_excel("/Users/aina/Desktop/uni/3r/1r_semestre/estadística/projecte/pinguins.xlsx")
+library(readxl)
+smokers <- read_excel("/Users/aina/Desktop/uni/3r/1r_semestre/estadística/projecte/smoking.xlsx")
 
 #Mostrem el dataset i un resum
-head(pinguins)
-summary(pinguins)
+head(smokers)
+summary(smokers)
 ```
 
 **Anàlisis dataset**
@@ -48,18 +48,19 @@ Podem veure que hi ha aproximadament 113 pinguins de l'espècie Adelie i uns 100
 Guardem en variables cada columna
 ```{r}
 #Guardem cada variable en un vector
-especies <- pinguins$species
-especies <- as.numeric(especies == "Adelie")
-bec_llargada <- pinguins$bill_length_mm
-bec_profunditat <- pinguins$bill_depth_mm
-aleta_llargada <- pinguins$flipper_length_mm
-massa_corporal <- pinguins$body_mass_g
+sexe <- as.numeric(as.factor(smokers$gender))-1
+edat <- smokers$age
+estat_civil <- as.numeric(as.factor(smokers$marital_status))-1
+estudis <- as.numeric(as.factor(smokers$highest_qualification))-1
+nacionalitat <- as.numeric(as.factor(smokers$nationality))-1
+etnia <- as.numeric(as.factor(smokers$ethnicity))-1
+fumador <- as.numeric(as.factor(smokers$smoke))-1
 ```
 
 ## Model regressió lineal múltiple
 Fem la regressió lineal múltiple amb 4 variables, en el nostre cas escollim les variables allargada del bec, profunditat del bec, allargada de de l'aleta i la massa corporal en funció de l'espècie. Per poder poder fer la regressió amb l'espècie els pinguins Adelie els codifiquem com a 1 i els Gentoo com a 0.
 ```{r}
-model <- lm(especies ~ bec_llargada + bec_profunditat + aleta_llargada + massa_corporal)
+model <- lm(fumador ~ sexe + edat + estat_civil)
 ```
 #EXPLICAR KLK EL MODEL
 
@@ -77,8 +78,8 @@ coef(summary(model))
 
 **Matriu de coovariàncies i variànices**
 ```{r}
-penguins_matriu <- data.frame(especies = especies, bec_llargada = bec_llargada, bec_profunditat=bec_profunditat, aleta_llargada = aleta_llargada, massa_corporal = massa_corporal)
-matriu_covariancies <- cov(penguins_matriu)
+data <- data.frame(sexe = sexe, edat = edat, estat_civil=estat_civil, fumador = fumador)
+matriu_covariancies <- cov(data)
 matriu_covariancies
 
 variancies <- diag(matriu_covariancies)
