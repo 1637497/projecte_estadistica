@@ -30,7 +30,7 @@ Els pingüins Gentoo també coneguts com a pingüíns de corona blanca són fàc
 
 Les illes que apareixen en el conjunt de dades són les Torgersen, les Biscoe i les Dream. Les tres illes es troben a la costa occidental de la península Antàrtica, lleument al nord del cercle polar antàrtic.
 
-El nostre dataset conté 7 variables, les variables espècie i illa son variables qualitatives. Per contra, l'allargada del bec, la profunditat del bec, l'allargada de de l'aleta i la massa corporal són variables qualitatives.
+El nostre dataset conté 7 variables, les variables espècie i illa son variables qualitatives. Per contra, l'allargada del bec, la profunditat del bec, l'allargada de de l'aleta i la massa corporal són variables quantitatives.
 
 
 **Gràfic de barres de la distribució d'espècies**
