@@ -1,0 +1,84 @@
+#EXERCICI 1
+library(readxl)
+#Carreguem les dades
+pinguins <- read.csv("C:\\Users\\Usuario\\OneDrive\\Escriptori\\UAB\\3r\\Anàlisi Estadístic\\trabajo final\\penguins1.csv")
+
+# Eliminem les files NA
+pinguins <- na.omit(pinguins)
+
+especies <- pinguins$species
+especies <- as.numeric(especies == "Adelie")
+bec_llargada <- pinguins$bill_length_mm
+bec_profunditat <- pinguins$bill_depth_mm
+aleta_llargada <- pinguins$flipper_length_mm
+massa_corporal <- pinguins$body_mass_g
+sexe <- pinguins$sex
+illa <- pinguins$island
+
+
+#Gràfica Sexes
+barplot(
+  table(pinguins$sex), 
+  col = c("blue", "red"), 
+  main = "Distribució de Sexes", 
+  xlab = "Sexe", 
+  ylab = "Frequència",
+  beside = TRUE,
+)
+
+#Gràfica Espècies
+barplot(
+  table(pinguins$species), 
+  col = c("green", "red",'blue'), 
+  main = "Distribució d'Espècies", 
+  xlab = "Espècie", 
+  ylab = "Frequència",
+  beside = TRUE,
+)
+
+#Gràfica Massa
+barplot(table(pinguins$body_mass_g), col = "skyblue", main = "Distribució Masses corporals", xlab = "Massa corporal", ylab = "Frequència", las = 2)
+
+#Gràfica Aleta
+barplot(table(aleta_allargada), col = "skyblue", main = "Distribució Llargades de l'aleta", xlab = "LLargada", ylab = "Frequència", las = 2)
+
+#Gràfica Bec
+barplot(table(bec_llargada), col = "skyblue", main = "Distribució Llargades del bec", xlab = "LLargada", ylab = "Frequència", las = 2)
+
+
+#aleta_llargada~sexe
+boxplot(aleta_llargada~sexe,
+        data=smokers,
+        main="aleta_llargada~sexe",
+        xlab="aleta_llargada",
+        ylab="sexe",
+        col="yellow",
+        border="black"
+)
+
+#bec_llargada~sexe
+boxplot(aleta_llargada~sexe,
+        data=smokers,
+        main="bec_llargada~sexe",
+        xlab="bec_llargada",
+        ylab="sexe",
+        col="yellow",
+        border="black"
+)
+
+
+#Gràfica Illes
+barplot(table(illa), col = "green", main = "Distribució d'illes", xlab = "Illa", ylab = "Frequència", las = 2)
+
+#Correlació massa aleta
+plot(massa_corporal, aleta_llargada, pch = 25, col = "green", xlab = "massa_corporal", ylab = "aleta_llargada")
+abline(lm(aleta_llargada ~ massa_corporal), col = "red", lwd = 5)
+legend("topleft", paste("Correlació:", round(cor(massa_corporal, aleta_llargada), 2)))
+
+#Correlació massa bec
+plot(massa_corporal, bec_llargada, pch = 25, col = "green", xlab = "massa_corporal", ylab = "aleta_llargada")
+abline(lm(bec_llargada ~ massa_corporal), col = "red", lwd = 5)
+legend("topleft", paste("Correlació:", round(cor(massa_corporal, bec_llargada), 2)))
+
+
+
