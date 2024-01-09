@@ -1,0 +1,35 @@
+male 0
+female 1
+
+Divorced 0
+Married 1
+Separated 
+Single 3
+Widowed 4
+
+A Levels
+Degree 1
+GCSE/CSE 2
+GCSE/O Level 3
+Higher/Sub Degree 4
+No Qualification 5
+ONC/BTEC 6
+Other/Sub Degree 7
+
+British 0
+English 1
+Irish 2
+Scottish 5
+Welsh 6
+Other 3
+Refused 4
+
+Asian 0
+Black 1
+Chinese 2
+Mixed 3
+White 5
+Refused 4
+
+No 0
+Yes 1
