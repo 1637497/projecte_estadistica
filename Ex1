@@ -4,7 +4,7 @@ library(readxl)
 
 smokers <- read_excel("C:\\Users\\Usuario\\OneDrive\\Escriptori\\UAB\\3r\\Anàlisi Estadístic\\trabajo final\\smoking.xlsx")
 
-N=308
+N=49
 sexe <- as.numeric(as.factor(smokers$gender))-1
 sexe <- sexe[1:N]
 edat <- smokers$age
