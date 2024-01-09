@@ -1,34 +1,112 @@
 #EXERCICI 1
 library(readxl)
 #Carreguem les dades
+pinguins0 <- read.csv("C:\\Users\\Usuario\\OneDrive\\Escriptori\\UAB\\3r\\Anàlisi Estadístic\\trabajo final\\penguins1.csv")
 
-smokers <- read_excel("C:\\Users\\Usuario\\OneDrive\\Escriptori\\UAB\\3r\\Anàlisi Estadístic\\trabajo final\\smoking.xlsx")
+# Eliminem les files NA
+pinguins0 <- na.omit(pinguins0)
 
-N=49
-sexe <- as.numeric(as.factor(smokers$gender))-1
-sexe <- sexe[1:N]
-edat <- smokers$age
-edat <- edat[1:N]
-estat_civil <- as.numeric(as.factor(smokers$marital_status))-1
-estat_civil <- estat_civil[1:N]
-estudis <- as.numeric(as.factor(smokers$highest_qualification))-1
-estudis <- estudis[1:N]
-nacionalitat <- as.numeric(as.factor(smokers$nationality))-1
-nacionalitat <- nacionalitat[1:N]
-etnia <- as.numeric(as.factor(smokers$ethnicity))-1
-etnia <- etnia[1:N]
-fumador <- as.numeric(as.factor(smokers$smoke))-1
-fumador <- fumador[1:N]
+# Seleccionar columnas específicas
+cols <- pinguins0[c("species", "bill_length_mm", "bill_depth_mm", 
+"flipper_length_mm","body_mass_g", "sex", "island")]
 
-model <- lm(fumador ~ estudis + sexe + edat)
+# Fijar la semilla para reproducibilidad
+set.seed(102)
+
+# Seleccionar 50 filas aleatorias
+valors_seed <- sample(1:nrow(cols), 50, replace = FALSE)
+
+# Crear un nuevo DataFrame con las 50 filas seleccionadas
+pinguins <- cols[valors_seed, ]
+
+
+
+
+especies <- pinguins$species
+especies <- as.numeric(especies == "Adelie")
+bec_llargada <- pinguins$bill_length_mm
+bec_profunditat <- pinguins$bill_depth_mm
+aleta_llargada <- pinguins$flipper_length_mm
+massa_corporal <- pinguins$body_mass_g
+sexe <- pinguins$sex
+illa <- pinguins$island
+
+
+#Gràfica Sexes
+barplot(
+  table(pinguins$sex), 
+  col = c("blue", "red"), 
+  main = "Distribució de Sexes", 
+  xlab = "Sexe", 
+  ylab = "Frequència",
+  beside = TRUE,
+)
+
+#Gràfica Espècies
+barplot(
+  table(pinguins$species), 
+  col = c("green", "red",'blue'), 
+  main = "Distribució d'Espècies", 
+  xlab = "Espècie", 
+  ylab = "Frequència",
+  beside = TRUE,
+)
+
+#Gràfica Massa
+barplot(table(pinguins$body_mass_g), col = "skyblue", main = "Distribució Masses corporals", xlab = "Massa corporal", ylab = "Frequència", las = 2)
+
+#Gràfica Aleta
+barplot(table(aleta_allargada), col = "skyblue", main = "Distribució Llargades de l'aleta", xlab = "LLargada", ylab = "Frequència", las = 2)
+
+#Gràfica Bec
+barplot(table(bec_llargada), col = "skyblue", main = "Distribució Llargades del bec", xlab = "LLargada", ylab = "Frequència", las = 2)
+
+
+#aleta_llargada~sexe
+boxplot(aleta_llargada~sexe,
+        data=smokers,
+        main="aleta_llargada~sexe",
+        xlab="aleta_llargada",
+        ylab="sexe",
+        col="yellow",
+        border="black"
+)
+
+#bec_llargada~sexe
+boxplot(aleta_llargada~sexe,
+        data=smokers,
+        main="bec_llargada~sexe",
+        xlab="bec_llargada",
+        ylab="sexe",
+        col="yellow",
+        border="black"
+)
+
+
+#Gràfica Illes
+barplot(table(illa), col = "green", main = "Distribució d'illes", xlab = "Illa", ylab = "Frequència", las = 2)
+
+#Correlació massa aleta
+plot(massa_corporal, aleta_llargada, pch = 25, col = "green", xlab = "massa_corporal", ylab = "aleta_llargada")
+abline(lm(aleta_llargada ~ massa_corporal), col = "red", lwd = 5)
+legend("topleft", paste("Correlació:", round(cor(massa_corporal, aleta_llargada), 2)))
+
+#Correlació massa bec
+plot(massa_corporal, bec_llargada, pch = 25, col = "green", xlab = "massa_corporal", ylab = "aleta_llargada")
+abline(lm(bec_llargada ~ massa_corporal), col = "red", lwd = 5)
+legend("topleft", paste("Correlació:", round(cor(massa_corporal, bec_llargada), 2)))
+
+
+#Fem el model
+model <- lm(massa_corporal~ especies + bec_llargada + aleta_llargada)
 summary(model)
 
 #u<-matrix(1, nrow = 10, ncol = 1)
-u=rep(1, times = N)
-x1=c(estudis)
-x2=c(edat)
-x3=c(estat_civil)
-y=matrix(c(fumador),ncol=1)
+u=rep(1, times = length(massa_corporal))
+x1=c(especies)
+x2=c(bec_llargada)
+x3=c(aleta_llargada)
+y=matrix(c(massa_corporal),ncol=1)
 
 X=t(rbind(u,x1,x2,x3))
 XTX=t(X)%*%X 
@@ -56,7 +134,7 @@ SST
 
 
 
-
+N=length(massa_corporal)
 K=3
 anova <- data.frame(
   Fv = c("REGRE", "ERROR", "TOTAL"),
@@ -91,7 +169,7 @@ val_ind <- function(model, X, MSE, variable_index) {
   
   # Calcula t0
   t0 <- numerator / denominator
-  print(abs(t0))
+  print((t0))
   return(abs(t0))
 }
 
@@ -102,3 +180,7 @@ resultado2_t0 <- val_ind(model, X, MSE, 2)
 resultado2_t0>qt(1-0.05/2,N-K-1)
 resultado3_t0 <- val_ind(model, X, MSE, 3)
 resultado3_t0>qt(1-0.05/2,N-K-1)
+
+
+
+
