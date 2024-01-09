@@ -1,0 +1,104 @@
+#EXERCICI 1
+library(readxl)
+#Carreguem les dades
+
+smokers <- read_excel("C:\\Users\\Usuario\\OneDrive\\Escriptori\\UAB\\3r\\Anàlisi Estadístic\\trabajo final\\smoking.xlsx")
+
+N=308
+sexe <- as.numeric(as.factor(smokers$gender))-1
+sexe <- sexe[1:N]
+edat <- smokers$age
+edat <- edat[1:N]
+estat_civil <- as.numeric(as.factor(smokers$marital_status))-1
+estat_civil <- estat_civil[1:N]
+estudis <- as.numeric(as.factor(smokers$highest_qualification))-1
+estudis <- estudis[1:N]
+nacionalitat <- as.numeric(as.factor(smokers$nationality))-1
+nacionalitat <- nacionalitat[1:N]
+etnia <- as.numeric(as.factor(smokers$ethnicity))-1
+etnia <- etnia[1:N]
+fumador <- as.numeric(as.factor(smokers$smoke))-1
+fumador <- fumador[1:N]
+
+model <- lm(fumador ~ estudis + sexe + edat)
+summary(model)
+
+#u<-matrix(1, nrow = 10, ncol = 1)
+u=rep(1, times = N)
+x1=c(estudis)
+x2=c(edat)
+x3=c(estat_civil)
+y=matrix(c(fumador),ncol=1)
+
+X=t(rbind(u,x1,x2,x3))
+XTX=t(X)%*%X 
+
+
+d=det(XTX)
+d
+
+iv=solve(XTX)
+iv
+
+beta=iv%*%t(X)%*%y
+beta
+
+
+
+SSE=t(y)%*%y-t(beta)%*%t(X)%*%y
+SSE
+
+SSR=t(beta)%*%t(X)%*%y -((sum(y))**2/N)
+SSR
+
+SST=SSE+SSR
+SST
+
+
+
+
+K=3
+anova <- data.frame(
+  Fv = c("REGRE", "ERROR", "TOTAL"),
+  gL = c(K, N-K-1, N-1),
+  SS = c(SSR, SSE, SST),
+  MS = c(SSR/K,SSE/(N-K-1),NA),
+  Fo = c((SSR/K)/(SSE/(N-K-1)),NA,NA)
+)
+anova
+
+Fo <- anova$Fo[1]
+Fo>qf(0.95,3,46)
+
+
+MSE=SSE/(N-K-1)
+# Función para calcular la validación individual de una variable en un modelo
+val_ind <- function(model, X, MSE, variable_index) {
+  # Obtén los parámetros estimados
+  beta <- coef(model)
+  
+  # Calcula la matriz (X'X)^(-1)
+  XtX_inv <- solve(crossprod(X))
+  
+  # Calcula la diagonal de la inversa de (X'X)
+  XtX_inv_diag <- diag(XtX_inv)
+  
+  # Calcula el numerador de t0: beta_i
+  numerator <- beta[variable_index + 1]
+  
+  # Calcula el denominador de t0
+  denominator <- sqrt(MSE * XtX_inv_diag[variable_index + 1])
+  
+  # Calcula t0
+  t0 <- numerator / denominator
+  print(abs(t0))
+  return(abs(t0))
+}
+
+
+resultado1_t0 <- val_ind(model, X, MSE, 1)
+resultado1_t0>qt(1-0.05/2,N-K-1)
+resultado2_t0 <- val_ind(model, X, MSE, 2)
+resultado2_t0>qt(1-0.05/2,N-K-1)
+resultado3_t0 <- val_ind(model, X, MSE, 3)
+resultado3_t0>qt(1-0.05/2,N-K-1)
