@@ -1,14 +1,14 @@
 #EXERCICI 1
 library(readxl)
 #Carreguem les dades
-pinguins0 <- read.csv("C:\\Users\\Usuario\\OneDrive\\Escriptori\\UAB\\3r\\Anàlisi Estadístic\\trabajo final\\penguins1.csv")
+salut0 <- read.csv("C:\\Users\\Usuario\\OneDrive\\Escriptori\\UAB\\3r\\Anàlisi Estadístic\\trabajo final\\Sleep_health_and_lifestyle_dataset.csv")
 
 # Eliminem les files NA
-pinguins0 <- na.omit(pinguins0)
+salut0 <- na.omit(salut0)
 
 # Seleccionar columnas específicas
-cols <- pinguins0[c("species", "bill_length_mm", "bill_depth_mm", 
-"flipper_length_mm","body_mass_g", "sex", "island")]
+# Seleccionar columnes específiques
+cols <- salut0[c("Gender", "Age", "Occupation", "Sleep.Duration", "Quality.of.Sleep", "Physical.Activity.Level", "Stress.Level", "BMI.Category", "Blood.Pressure")]
 
 # Fijar la semilla para reproducibilidad
 set.seed(102)
@@ -17,19 +17,24 @@ set.seed(102)
 valors_seed <- sample(1:nrow(cols), 50, replace = FALSE)
 
 # Crear un nuevo DataFrame con las 50 filas seleccionadas
-pinguins <- cols[valors_seed, ]
+salut <- cols[valors_seed, ]
 
 
 
 
-especies <- pinguins$species
-especies <- as.numeric(factor(especies, levels = unique(especies)))
-bec_llargada <- pinguins$bill_length_mm
-bec_profunditat <- pinguins$bill_depth_mm
-aleta_llargada <- pinguins$flipper_length_mm
-massa_corporal <- pinguins$body_mass_g
-sexe <- pinguins$sex
-illa <- pinguins$island
+gender <- salut$Gender
+sexe <- as.numeric(factor(gender, levels = unique(gender)))
+edat <- salut$Age
+ofici <- salut$Occupation
+ofici<- as.numeric(factor(ofici, levels = unique(ofici)))
+duracio <- salut$Sleep.Duration
+activitat <- salut$Physical.Activity.Level
+estress <- salut$Stress.Level
+BMI <- salut$BMI.Category
+BMI <- as.numeric(factor(BMI, levels = unique(BMI)))
+pres <- salut$Blood.Pressure
+pres <- as.numeric(factor(pres, levels = unique(pres)))
+calitat <- salut$Quality.of.Sleep
 
 
 #Gràfica Sexes
@@ -98,17 +103,18 @@ legend("topleft", paste("Correlació:", round(cor(massa_corporal, bec_llargada),
 
 
 #Fem el model
-model <- lm(massa_corporal~ especies + bec_llargada + aleta_llargada)
+model <- lm(calitat~ duracio + BMI + activitat + estress)
 summary(model)
 
 #u<-matrix(1, nrow = 10, ncol = 1)
-u=rep(1, times = length(massa_corporal))
-x1=c(especies)
-x2=c(bec_llargada)
-x3=c(aleta_llargada)
-y=matrix(c(massa_corporal),ncol=1)
+u=rep(1, times = 50)
+x1=c(duracio)
+x2=c(BMI)
+x3=c(activitat)
+x4=c(estress)
+y=matrix(c(calitat),ncol=1)
 
-X=t(rbind(u,x1,x2,x3))
+X=t(rbind(u,x1,x2,x3,x4))
 XTX=t(X)%*%X 
 
 
@@ -134,8 +140,8 @@ SST
 
 
 
-N=length(massa_corporal)
-K=3
+N=50
+K=4
 anova <- data.frame(
   Fv = c("REGRE", "ERROR", "TOTAL"),
   gL = c(K, N-K-1, N-1),
@@ -146,7 +152,8 @@ anova <- data.frame(
 anova
 
 Fo <- anova$Fo[1]
-Fo>qf(0.95,3,46)
+Fo>qf(0.95,4,45)
+
 
 
 MSE=SSE/(N-K-1)
@@ -169,6 +176,7 @@ val_ind <- function(model, X, MSE, variable_index) {
   
   # Calcula t0
   t0 <- numerator / denominator
+  print(beta[variable_index + 1])
   print((t0))
   return(abs(t0))
 }
@@ -180,7 +188,74 @@ resultado2_t0 <- val_ind(model, X, MSE, 2)
 resultado2_t0>qt(1-0.05/2,N-K-1)
 resultado3_t0 <- val_ind(model, X, MSE, 3)
 resultado3_t0>qt(1-0.05/2,N-K-1)
+resultado4_t0 <- val_ind(model, X, MSE, 4)
+resultado4_t0>qt(1-0.05/2,N-K-1)
+
+
+#modelr <- lm(duracio~ofici + activitat + estress)
+#summary(modelr)
+#q=1
+#k=3
+
+
+#X=t(rbind(u,x2,x3,x4))
+#XTX=t(X)%*%X 
+
+
+#d=det(XTX)
+#d
+
+#iv=solve(XTX)
+#iv
+
+#beta=iv%*%t(X)%*%y
+#beta
 
 
 
 
+#SSRr=t(beta)%*%t(X)%*%y -((sum(y))**2/N)
+#SSRr
+
+
+#Fo=((SSR-SSRr)/q)/(SSR/(n-k-1))
+#Fo>qf(0.95,1,46)
+#El model no és tan bò com l'original
+
+
+#Supòsits del Model
+
+#Homocedasticitat realitzant la prova de Breusch-Pagan
+bptest(model)
+
+#p-value es 0.4516, el qual és més gran que la significació 0.05, per tant 
+#no es disposa d'evidència suficient per rebutjar la hipòtesi nul·la
+#d'homocedasticitat, per tant podem afirmar que la variànça dels errors és manté
+#constant
+
+#Multicol·linealitat utilitzant vif
+vif(model)
+#Cap de les X té un valor alt superior a 10, per tant podem confirmar
+#la no Multicol·linealitat
+
+#Matrius
+mat<-vcov(model)
+varianzas <- diag(mat)
+cov2cor(vcov(model))
+
+#Residuals
+
+# Obtén los residuos
+r <- residuals(model)
+
+# Grèfica un Q-Q plot
+qqnorm(r)
+qqline(r)
+
+#prediccions
+pred <- predict(model, pinguins, interval = "prediction")
+head(pred)
+#plot(model)
+
+#bondad d'ajust
+summary(model)$r.squared
