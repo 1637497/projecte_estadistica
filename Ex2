@@ -1,16 +1,14 @@
-#EXERCICI 1
-library(lmtest)
+#EXERCICI 2
 library(readxl)
-library(car)
 #Carreguem les dades
-pinguins0 <- read.csv("C:\\Users\\Usuario\\OneDrive\\Escriptori\\UAB\\3r\\Anàlisi Estadístic\\trabajo final\\penguins1.csv")
+salut0 <- read.csv("C:\\Users\\Usuario\\OneDrive\\Escriptori\\UAB\\3r\\Anàlisi Estadístic\\trabajo final\\Sleep_health_and_lifestyle_dataset.csv")
 
 # Eliminem les files NA
-pinguins0 <- na.omit(pinguins0)
+salut0 <- na.omit(salut0)
 
 # Seleccionar columnas específicas
-cols <- pinguins0[c("species", "bill_length_mm", "bill_depth_mm", 
-                    "flipper_length_mm","body_mass_g", "sex", "island")]
+# Seleccionar columnes específiques
+cols <- salut0[c("Gender", "Age", "Occupation", "Sleep.Duration", "Quality.of.Sleep", "Physical.Activity.Level", "Stress.Level", "BMI.Category", "Blood.Pressure","Sleep.Disorder")]
 
 # Fijar la semilla para reproducibilidad
 set.seed(102)
@@ -19,25 +17,30 @@ set.seed(102)
 valors_seed <- sample(1:nrow(cols), 50, replace = FALSE)
 
 # Crear un nuevo DataFrame con las 50 filas seleccionadas
-pinguins <- cols[valors_seed, ]
+salut <- cols[valors_seed, ]
 
 
 
 
-especies <- pinguins$species
-especies <- as.numeric(factor(especies, levels = unique(especies)))
-bec_llargada <- pinguins$bill_length_mm
-bec_profunditat <- pinguins$bill_depth_mm
-aleta_llargada <- pinguins$flipper_length_mm
-massa_corporal <- pinguins$body_mass_g
-sexe <- pinguins$sex
-sexe <- as.numeric(sexe == "female")
-illa <- pinguins$island
-illa <- as.numeric(factor(illa, levels = unique(illa)))
+gender <- salut$Gender
+sexe <- ifelse(gender == "Female", 1, 0)
+edat <- salut$Age
+ofici <- salut$Occupation
+ofici<- as.numeric(factor(ofici, levels = unique(ofici)))
+duracio <- salut$Sleep.Duration
+activitat <- salut$Physical.Activity.Level
+estress <- salut$Stress.Level
+calitat <- salut$Quality.of.Sleep
+BMI <- salut$BMI.Category
+BMI <- as.numeric(factor(BMI, levels = unique(BMI)))
+pres <- salut$Blood.Pressure
+pres <- as.numeric(factor(pres, levels = unique(pres)))
+sdis <- salut$Sleep.Disorder
+sdis <- ifelse(sdis == "None", 0, 1)
 
 
 
-regr <- glm(sexe ~ illa + especies, family = binomial, data = pinguins)
+regr <- glm(sdis ~ BMI + pres + calitat, family = binomial, data = salut)
 summary(regr)
 
 #interval conf
@@ -63,26 +66,16 @@ qqline(r)
 #noves dades
 
 # Seleccionar columnas específicas
-cols <- pinguins0[c("sex", "island", "species")]
+cols <- salut0[c("Sleep.Disorder","BMI.Category","Blood.Pressure", "Quality.of.Sleep")]
 
-set.seed(27)
+set.seed(30)
 
 test <- sample(1:nrow(cols), 50, replace = FALSE)
 
 test <- cols[test, ]
 
-#test$sex <- factor(test$sex)
-#test$island <- factor(test$island)
-#test$species <- factor(test$species)
-
-# Convertir els factors a numèrics
-#test$sex <- as.numeric(test$sex == "female")
-#test$island <- as.numeric(factor(test$island, levels = unique(test$island)))
-#test$species <- as.numeric(factor(test$species, levels = unique(test$species)))
-
-# Mostrar el conjunto de datos con variables numéricas
-sexetest=test$sex
-sexetest=as.numeric(sexetest == "female")
+sdistest <- test$Sleep.Disorder
+sdistest <- ifelse(sdistest == "None", 0, 1)
 
 #predicció
 pred <- predict(regr, newdata = test, type = "response")
@@ -91,12 +84,15 @@ pred_bin <- ifelse(pred > 0.5, 1, 0)
 
 
 #precisio
-prec <- sum(predp_bin == sexetest) / length(test$sex)
+prec <- sum(predp_bin == sdistest) / length(sdistest)
 
 print(prec)
 
 
-poiss=glm(sexe ~ illa + especies, data = pinguins, family = poisson)
+
+
+#Poisson
+poiss=glm(sexe ~ ofici + BMI + pres, data = salut, family = poisson)
 summary(poiss)
 
 #interval conf
@@ -125,7 +121,7 @@ predp <- predict(poiss, newdata = test, type = "response")
 predp_bin <- ifelse(predp > 0.5, 1, 0)
 
 #precisio
-precp <- sum(predp_bin == sexetest) / length(test$sex)
+precp <- sum(predp_bin == sdistest) / length(sdistest)
 
 print(precp)
 
