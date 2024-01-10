@@ -1,0 +1,329 @@
+---
+title: "Projecte estadística"
+author: "Martí Ortega (1637970) i Aina Setó (1637497)"
+date: "2023-12-23"
+output: word_document
+---
+
+```{r}
+library(readxl)
+son_dataset <- read_excel("/Users/aina/Desktop/uni/3r/1r_semestre/estadística/projecte/Sleep_health_and_lifestyle_dataset.xlsx")
+
+#Ens quedem amb 50 mostres
+set.seed(102)
+mostres_50 <- sample(1:nrow(son_dataset), 50, replace = FALSE)
+son <- son_dataset[mostres_50, ]
+
+#Mostrem el dataset i un resum
+head(son)
+summary(son)
+
+```
+
+```{r}
+#Passem les dades qualitatives a quantitatives
+son$Gender <- as.numeric(as.factor(son$Gender))-1
+son$Occupation <- as.numeric(as.factor(son$Occupation))-1
+son$`Sleep Duration` <- as.numeric(son$`Sleep Duration`)
+son$`BMI Category` <- as.numeric(as.factor(son$`BMI Category`))-1
+son$`Sleep Disorder` <- as.numeric(son$`Sleep Disorder` != "None")
+
+```
+
+## 1.Model regressió lineal múltiple
+
+```{r}
+model <- lm(`Quality of Sleep` ~ `Sleep Duration` + Occupation + `Physical Activity Level` + `Stress Level`, data = son)
+#summary(model)
+#coef(model)
+```
+#EXPLICAR KLK EL MODEL
+
+**Avaluació global**
+```{r}
+u=rep(1, times = 50)
+x1=as.integer(c(son$`Sleep Duration`))
+x2=c(son$Occupation)
+x3=c(son$`Physical Activity Level`)
+x4=c(son$`Stress Level`)
+y=matrix(c(son$`Quality of Sleep`),ncol=1)
+
+N=50
+K=4
+X=t(rbind(u,x1,x2,x3,x4))
+XTX=t(X)%*%X 
+d=det(XTX)
+iv=solve(XTX)
+beta=iv%*%t(X)%*%y
+
+SSE=t(y)%*%y-t(beta)%*%t(X)%*%y
+SSR=t(beta)%*%t(X)%*%y -((sum(y))**2/N)
+SST=SSE+SSR
+
+#Validació Global
+anova <- data.frame(
+  Fv = c("REGRE", "ERROR", "TOTAL"),
+  gL = c(K, N-K-1, N-1),
+  SS = c(SSR, SSE, SST),
+  MS = c(SSR/K,SSE/(N-K-1),NA),
+  Fo = c((SSR/K)/(SSE/(N-K-1)),NA,NA)
+)
+anova
+
+Fo <- anova$Fo[1]
+Fo>qf(0.95,3,46)
+```
+#EXPLICAR AVALUACIÓ GLOBAL
+
+**Avaluació individual**
+```{r}
+anova(model, test = "Chisq")
+```
+Variable Sleep Duration:
+Pr(>F): 2.2e-16 < 0.05
+Interpretació: Hi ha evidència significativa per rebutjar la hipòtesi nul·la relacionada amb els la duració del son. Això suggereix que "Sleep Duration" és significativa en el model.
+
+Variable Occupation:
+Pr(>F): 0.2512 > 0.05
+Interpretació: No hi ha evidència significativa per rebutjar la hipòtesi nul·la relacionada amb el treball, aquesta variable no és significativa en el model.
+
+Variable Physical Activity Level:
+Pr(>F): 0.7917 > 0.05
+Interpretació: No hi ha evidència significativa per rebutjar la hipòtesi nul·la relacionada amb l'activitat física, aquesta variable no és significativa en el model.
+
+Variable Stress Level:
+Pr(>F): 1.302e-09 < 0.05
+Interpretació: Hi ha evidència significativa per rebutjar la hipòtesi nul·la relacionada amb el nivell d'estrés. Això suggereix que "Stress Level" és significativa en el model.
+
+Els valors p baixos associats amb la duració de son, l'activitat física i el nivell d'estrés indiquen que aquestes tres variables són significativament relacionades amb la qualitat del son, mentre que el tipus de treball no.
+
+**Matriu de coovariàncies**
+```{r}
+matriu_covariancies <- vcov(model)
+matriu_covariancies
+```
+La matriu de covariances resumeix les relacions lineals entre múltiples variables mostrant les covariances entre cada parella de variables en un conjunt de dades. Cada coeficient associat amb les variables predictores indica com canvia la puntuació de depressió per cada unitat de canvi en aquesta variable, mantenint les altres constants. D'aquesta matriu destaquem el coeficient negatiu per el nivell d'estrés i l'activitat física, aquest ens vol dir que un augment de l'activitat física es relaciona amb una disminució en els nivells d'estrés. Els coeficients permeten entendre les contribucions relatives de cada variable en la predicció de la puntuació de depressió. 
+
+ 
+**Matriu de variànices**
+```{r}
+variancies <- diag(matriu_covariancies)
+variancies
+```
+La matriu de variances proporciona informació sobre la variabilitat individual de cada variable, en aquest cas les variances no són gaires grans.
+
+
+**Matriu de correalció**
+```{r}
+correalcio <- cov2cor(matriu_covariancies)
+correalcio
+```
+La matriu de correlació ens mostra la força i la direcció de les relacions lineals entre les variables, permetent identificar patrons d'associació entre les mateixes en un conjunt de dades.
+
+
+**Residuals**
+```{r}
+residuals <- residuals(model)
+print(head(residuals, 5))
+qqnorm(residuals)
+qqline(residuals)
+```
+#EXPLICAR RESIDUALS
+
+
+**Prediccions**
+```{r}
+set.seed(22)
+mostres_50 <- sample(1:nrow(son_dataset), 10, replace = FALSE)
+son_test <- son_dataset[mostres_50, ]
+son_test$Occupation <- as.numeric(as.factor(son_test$Occupation))-1
+son_test$`Sleep Duration` <- as.numeric(son_test$`Sleep Duration`)
+
+son_test <- son_test[c("Quality of Sleep", "Sleep Duration", "Occupation", "Physical Activity Level","Stress Level")]
+
+#Fer les prediccions
+prediccions <- predict(model, son_test, type = "response")
+prediccions <- round(prediccions)
+real <- son_test$`Quality of Sleep`
+precision <- sum(prediccions == real) / length(real)
+print('Valors predits: ')
+prediccions
+print('Valors esperats: ')
+real
+print('Precisió: ')
+precision
+```
+El accuracy de les prediccions són del 100% i per tant podem dir que el model és molt bo a l'hora de fer predir quina serà la qualitat del son.
+
+
+**Intèrvals de confiança**
+```{r}
+#Intèrval de confiança
+interval_confiança <- confint(model)
+print(head(interval_confiança, 5))
+```
+#EXPLICAR INTÈRVALS
+
+
+**Model restringit**
+Per el model restringit agafem els variables de duració del son i el nivell d'estrés i descartem les variables activitat física i el tipus de feina ja que no eren significativa en el model anterior.
+```{r}
+model_restringit <- lm(`Quality of Sleep` ~ `Sleep Duration` + `Stress Level`, data = son)
+anova(model_restringit, test = "Chisq")
+anova(model, model_restringit, test = "Chisq")
+```
+En el model restigit la duració del son i el nivell d'estrés són variables significatives ja que els p-valors són menors que 0.05.
+En el test de Chisq compara la suma dels quadrats dels residus entre els dos models. El valor p (0.00118) és menor que el nivell de significança 0.05, indicant que el Model inicial és significativament millor que el model restringit.
+
+
+##2.Model regressió logística i Poisson
+
+**2.1.Regressió logística**
+
+```{r}
+model_bin <- glm(`Sleep Disorder` ~ Gender  + Occupation + `Quality of Sleep`, family = "binomial", data = son)
+summary(model_bin)
+```
+
+**Intèrvals de confiança**
+```{r}
+#Intèrval de confiança
+interval_confiança <- confint(model_bin)
+print(head(interval_confiança, 5))
+```
+
+**Matriu de coovariàncies**
+```{r}
+matriu_covariancies <- vcov(model_bin)
+matriu_covariancies
+```
+
+**Matriu de variànices**
+```{r}
+variancies <- diag(matriu_covariancies)
+variancies
+```
+
+**Residuals**
+```{r}
+residuals <- residuals(model_bin)
+print(head(residuals, 5))
+qqnorm(residuals)
+qqline(residuals)
+```
+#EXPLICAR RESIDUALS
+
+
+**Prediccions**
+```{r}
+set.seed(22)
+mostres_50 <- sample(1:nrow(son_dataset), 10, replace = FALSE)
+son_test <- son_dataset[mostres_50, ]
+son_test$Occupation <- as.numeric(as.factor(son_test$Occupation))-1
+son_test$`Sleep Duration` <- as.numeric(son_test$`Sleep Duration`)
+
+son_test <- son_test[c("Quality of Sleep", "Sleep Duration", "Occupation", "Physical Activity Level","Stress Level")]
+
+#Fer les prediccions
+prediccions <- predict(model_bin, son_test, type = "response")
+prediccions <- round(prediccions)
+real <- son_test$`Quality of Sleep`
+precision <- sum(prediccions == real) / length(real)
+print('Valors predits: ')
+prediccions
+print('Valors esperats: ')
+real
+print('Precisió: ')
+precision
+```
+
+
+**2.2.Regressió de Poisson**
+
+```{r}
+model_pois <- glm(`Sleep Disorder` ~ Gender  + Occupation + `Quality of Sleep`, family = "poisson", data = son)
+summary(model_pois)
+```
+
+**Intèrvals de confiança**
+```{r}
+#Intèrval de confiança
+interval_confiança <- confint(model_pois)
+print(head(interval_confiança, 5))
+```
+
+**Matriu de coovariàncies**
+```{r}
+matriu_covariancies <- vcov(model_pois)
+matriu_covariancies
+```
+
+**Matriu de variànices**
+```{r}
+variancies <- diag(matriu_covariancies)
+variancies
+```
+
+**Residuals**
+```{r}
+residuals <- residuals(model_pois)
+print(head(residuals, 5))
+qqnorm(residuals)
+qqline(residuals)
+```
+#EXPLICAR RESIDUALS
+
+
+**Prediccions**
+```{r}
+set.seed(22)
+mostres_50 <- sample(1:nrow(son_dataset), 10, replace = FALSE)
+son_test <- son_dataset[mostres_50, ]
+son_test$Occupation <- as.numeric(as.factor(son_test$Occupation))-1
+son_test$`Sleep Duration` <- as.numeric(son_test$`Sleep Duration`)
+
+son_test <- son_test[c("Quality of Sleep", "Sleep Duration", "Occupation", "Physical Activity Level","Stress Level")]
+
+#Fer les prediccions
+prediccions <- predict(model_pois, son_test, type = "response")
+prediccions <- round(prediccions)
+real <- son_test$`Quality of Sleep`
+precision <- sum(prediccions == real) / length(real)
+print('Valors predits: ')
+prediccions
+print('Valors esperats: ')
+real
+print('Precisió: ')
+precision
+```
+
+
+
+
+
+## 3.ANOVA 
+Aquest apartat hem seleccionat les variables "Gender" i "Occupation" per predir si la persona té algun "Sleep Disorder".
+```{r}
+#Fem el ANOVA
+anova <- aov(`Sleep Disorder` ~ `Gender` + `Occupation`,  data = son)
+summary(anova)
+```
+Variable Gender:
+Pr(>F): 0.0339 < 0.05
+Interpretació: Hi ha evidència significativa per rebutjar la hipòtesi nul·la relacionada amb el sexe. Això suggereix que "Gender" és significativa en el model.
+
+Variable Occupation:
+Pr(>F): 9.49e-06 < 0.05
+Interpretació: Hi ha evidència significativa per rebutjar la hipòtesi nul·la relacionada amb la feina. Això suggereix que "Occupation" és significativa en el model.
+
+les dues variables, "Gender" i "Occupation", mostren una associació significativa amb la variable de "Sleep Disorder", segons els p-values baixos.
+
+
+**Família binomial**
+Fem un model de regressió logística, amb les mateixes variables, fent servir la família binomial.
+```{r}
+model_binomial <- glm(`Sleep Disorder` ~ `Gender` + `Occupation`, family = binomial, data = son)
+summary(model_binomial)
+```
+Els resultats del model de regressió logística mostren que la variable "Occupation" té un impacte significatiu en la probabilitat de tenir un trastorn del son (Sleep Disorder), ja que el p-value associat és molt petit (0.000879). D'altra banda, la variable "Gender" no mostra una significació estadística clara (p-value de 0.241960).
+
