@@ -1,0 +1,25 @@
+## 3.ANOVA 
+Aquest apartat hem seleccionat les variables "Gender" i "Occupation" per predir si la persona té algun "Sleep Disorder".
+```{r}
+#Fem el ANOVA
+anova <- aov(`Sleep Disorder` ~ `Gender` + `Occupation`,  data = son)
+summary(anova)
+```
+Variable Gender:
+Pr(>F): 0.0339 < 0.05
+Interpretació: Hi ha evidència significativa per rebutjar la hipòtesi nul·la relacionada amb el sexe. Això suggereix que "Gender" és significativa en el model.
+
+Variable Occupation:
+Pr(>F): 9.49e-06 < 0.05
+Interpretació: Hi ha evidència significativa per rebutjar la hipòtesi nul·la relacionada amb la feina. Això suggereix que "Occupation" és significativa en el model.
+
+les dues variables, "Gender" i "Occupation", mostren una associació significativa amb la variable de "Sleep Disorder", segons els p-values baixos.
+
+
+**Família binomial**
+Fem un model de regressió logística, amb les mateixes variables, fent servir la família binomial.
+```{r}
+model_binomial <- glm(`Sleep Disorder` ~ `Gender` + `Occupation`, family = binomial, data = son)
+summary(model_binomial)
+```
+
