@@ -1,0 +1,142 @@
+#EXERCICI 1
+library(lmtest)
+library(readxl)
+library(car)
+#Carreguem les dades
+pinguins0 <- read.csv("C:\\Users\\Usuario\\OneDrive\\Escriptori\\UAB\\3r\\Anàlisi Estadístic\\trabajo final\\penguins1.csv")
+
+# Eliminem les files NA
+pinguins0 <- na.omit(pinguins0)
+
+# Seleccionar columnas específicas
+cols <- pinguins0[c("species", "bill_length_mm", "bill_depth_mm", 
+                    "flipper_length_mm","body_mass_g", "sex", "island")]
+
+# Fijar la semilla para reproducibilidad
+set.seed(102)
+
+# Seleccionar 50 filas aleatorias
+valors_seed <- sample(1:nrow(cols), 50, replace = FALSE)
+
+# Crear un nuevo DataFrame con las 50 filas seleccionadas
+pinguins <- cols[valors_seed, ]
+
+
+
+
+especies <- pinguins$species
+especies <- as.numeric(factor(especies, levels = unique(especies)))
+bec_llargada <- pinguins$bill_length_mm
+bec_profunditat <- pinguins$bill_depth_mm
+aleta_llargada <- pinguins$flipper_length_mm
+massa_corporal <- pinguins$body_mass_g
+sexe <- pinguins$sex
+sexe <- as.numeric(sexe == "female")
+illa <- pinguins$island
+illa <- as.numeric(factor(illa, levels = unique(illa)))
+
+
+
+regr <- glm(sexe ~ illa + especies, family = binomial, data = pinguins)
+summary(regr)
+
+#interval conf
+confint(regr,level = 0.95)
+
+#matrius
+mat<-vcov(regr)
+varianzas <- diag(mat)
+cov2cor(vcov(regr))
+
+
+#Residuals
+
+r <- residuals(regr)
+
+# Grèfica un Q-Q plot
+qqnorm(r)
+qqline(r)
+
+
+#Prediccions
+
+#noves dades
+
+# Seleccionar columnas específicas
+cols <- pinguins0[c("species", "sex", "island")]
+
+# Fijar la semilla para reproducibilidad
+set.seed(15)
+
+# Seleccionar 50 filas aleatorias
+test <- sample(1:nrow(cols), 50, replace = FALSE)
+
+# Crear un nuevo DataFrame con las 50 filas seleccionadas
+test <- cols[test, ]
+
+# Mostrar el conjunto de datos con variables numéricas
+print(test)
+#predicció
+pred <- predict(regr, newdata = test, type = "response")
+
+pred_bin <- ifelse(pred > 0.5, 1, 0)
+
+#precisio
+prec <- sum(pred_bin == sexe) / length(sexe)
+
+print(prec)
+
+
+poiss=glm(sexe ~ illa + especies, data = pinguins, family = poisson)
+summary(poiss)
+
+#interval conf
+confint(poiss,level = 0.95)
+
+#matrius
+matp<-vcov(poiss)
+varianzasp <- diag(matp)
+cov2cor(vcov(poiss))
+
+
+#Residuals
+
+rp <- residuals(poiss)
+
+# Grèfica un Q-Q plot
+qqnorm(rp)
+qqline(rp)
+
+
+#Prediccions
+
+#noves dades
+
+
+# Seleccionar columnas específicas
+cols <- pinguins0[c("species", "sex", "island")]
+
+# Fijar la semilla para reproducibilidad
+set.seed(27)
+
+# Seleccionar 50 filas aleatorias
+test <- sample(1:nrow(cols), 50, replace = FALSE)
+
+# Crear un nuevo DataFrame con las 50 filas seleccionadas
+test <- cols[test, ]
+
+# Mostrar el conjunto de datos con variables numéricas
+print(test)
+
+
+#predicció
+predp <- predict(poiss, newdata = test, type = "response")
+
+predp_bin <- ifelse(predp > 0.5, 1, 0)
+
+#precisio
+precp <- sum(predp_bin == sexe) / length(sexe)
+
+print(precp)
+
+  
