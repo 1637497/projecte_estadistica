@@ -1,24 +1,46 @@
 #EXERCICI 1
 library(readxl)
 #Carreguem les dades
-pinguins <- read.csv("C:\\Users\\Usuario\\OneDrive\\Escriptori\\UAB\\3r\\Anàlisi Estadístic\\trabajo final\\penguins1.csv")
+salut0 <- read.csv("C:\\Users\\Usuario\\OneDrive\\Escriptori\\UAB\\3r\\Anàlisi Estadístic\\trabajo final\\Sleep_health_and_lifestyle_dataset.csv")
 
 # Eliminem les files NA
-pinguins <- na.omit(pinguins)
+salut0 <- na.omit(salut0)
 
-especies <- pinguins$species
-especies <- as.numeric(especies == "Adelie")
-bec_llargada <- pinguins$bill_length_mm
-bec_profunditat <- pinguins$bill_depth_mm
-aleta_llargada <- pinguins$flipper_length_mm
-massa_corporal <- pinguins$body_mass_g
-sexe <- pinguins$sex
-illa <- pinguins$island
+# Seleccionar columnas específicas
+# Seleccionar columnes específiques
+cols <- salut0[c("Gender", "Age", "Occupation", "Sleep.Duration", "Quality.of.Sleep", "Physical.Activity.Level", "Stress.Level", "BMI.Category", "Blood.Pressure","Sleep.Disorder")]
 
+# Fijar la semilla para reproducibilidad
+set.seed(102)
+
+# Seleccionar 50 filas aleatorias
+valors_seed <- sample(1:nrow(cols), 50, replace = FALSE)
+
+# Crear un nuevo DataFrame con las 50 filas seleccionadas
+salut <- cols[valors_seed, ]
+
+
+
+
+gender <- salut$Gender
+sexe <- as.numeric(factor(gender, levels = unique(gender)))
+edat <- salut$Age
+ofici <- salut$Occupation
+ofici<- as.numeric(factor(ofici, levels = unique(ofici)))
+duracio <- salut$Sleep.Duration
+activitat <- salut$Physical.Activity.Level
+estress <- salut$Stress.Level
+BMI <- salut$BMI.Category
+BMI <- as.numeric(factor(BMI, levels = unique(BMI)))
+pres <- salut$Blood.Pressure
+pres <- as.numeric(factor(pres, levels = unique(pres)))
+calitat <- salut$Quality.of.Sleep
+sdis <- salut$Sleep.Disorder
+sdis <- ifelse(sdis == "None", 0, 1)
 
 #Gràfica Sexes
 barplot(
-  table(pinguins$sex), 
+  table(gender), 
   col = c("blue", "red"), 
   main = "Distribució de Sexes", 
   xlab = "Sexe", 
@@ -26,59 +48,47 @@ barplot(
   beside = TRUE,
 )
 
-#Gràfica Espècies
+#Gràfica Disorder
 barplot(
-  table(pinguins$species), 
-  col = c("green", "red",'blue'), 
-  main = "Distribució d'Espècies", 
-  xlab = "Espècie", 
+  table(salut$Sleep.Disorder), 
+  col = c("red", "green","black"), 
+  main = "Distribució de Trastorns", 
+  xlab = "Trastorn", 
   ylab = "Frequència",
   beside = TRUE,
 )
 
-#Gràfica Massa
-barplot(table(pinguins$body_mass_g), col = "skyblue", main = "Distribució Masses corporals", xlab = "Massa corporal", ylab = "Frequència", las = 2)
+#Gràfica Oficis
+colors <- c("skyblue", "blue", "lightgreen", "yellow", "black", "green", "salmon",'red')
 
-#Gràfica Aleta
-barplot(table(aleta_allargada), col = "skyblue", main = "Distribució Llargades de l'aleta", xlab = "LLargada", ylab = "Frequència", las = 2)
-
-#Gràfica Bec
-barplot(table(bec_llargada), col = "skyblue", main = "Distribució Llargades del bec", xlab = "LLargada", ylab = "Frequència", las = 2)
+pie(table(salut$Occupation), main = "Distribució d'Oficis", col = colors)
 
 
-#aleta_llargada~sexe
-boxplot(aleta_llargada~sexe,
-        data=smokers,
-        main="aleta_llargada~sexe",
-        xlab="aleta_llargada",
-        ylab="sexe",
-        col="yellow",
-        border="black"
-)
+#Gràfica Duracions
+barplot(table(duracio), col = "skyblue", main = "Distribució de Duracions", xlab = "Duració", ylab = "Freqüència")
 
-#bec_llargada~sexe
-boxplot(aleta_llargada~sexe,
-        data=smokers,
-        main="bec_llargada~sexe",
-        xlab="bec_llargada",
-        ylab="sexe",
-        col="yellow",
-        border="black"
-)
+#Gràfica Edats
+barplot(table(salut$Age), col = 'red', main = "Distribució d'Edats", xlab = "Edat", ylab = "Freqüència")
 
 
-#Gràfica Illes
-barplot(table(illa), col = "green", main = "Distribució d'illes", xlab = "Illa", ylab = "Frequència", las = 2)
+#Gràfica Activitat
+barplot(table(activitat), col = 'green', main = "Distribució d'Activitat", xlab = "Activitat", ylab = "Freqüència")
 
-#Correlació massa aleta
-plot(massa_corporal, aleta_llargada, pch = 25, col = "green", xlab = "massa_corporal", ylab = "aleta_llargada")
-abline(lm(aleta_llargada ~ massa_corporal), col = "red", lwd = 5)
-legend("topleft", paste("Correlació:", round(cor(massa_corporal, aleta_llargada), 2)))
 
-#Correlació massa bec
-plot(massa_corporal, bec_llargada, pch = 25, col = "green", xlab = "massa_corporal", ylab = "aleta_llargada")
-abline(lm(bec_llargada ~ massa_corporal), col = "red", lwd = 5)
-legend("topleft", paste("Correlació:", round(cor(massa_corporal, bec_llargada), 2)))
+#Correlació calitat duracio
+plot(duracio, calitat, pch = 25, col = "green", xlab = "duracio", ylab = "calitat")
+abline(lm(calitat ~ duracio), col = "red", lwd = 5)
+legend("topleft", paste("Correlació:", round(cor(duracio, calitat), 2)))
 
+#Correlació calitat duracio
+plot(estress, calitat, pch = 25, col = "green", xlab = "estres", ylab = "calitat")
+abline(lm(calitat ~ estress), col = "red", lwd = 5)
+legend("topright", paste("Correlació:", round(cor(estress, calitat), 2)))
+
+
+#Correlació calitat duracio
+plot(edat, calitat, pch = 25, col = "green", xlab = "edat", ylab = "calitat")
+abline(lm(calitat ~ edat), col = "red", lwd = 5)
+legend("topright", paste("Correlació:", round(cor(edat, calitat), 2)))
 
 
