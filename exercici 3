@@ -13,7 +13,7 @@ Variable Occupation:
 Pr(>F): 9.49e-06 < 0.05
 Interpretació: Hi ha evidència significativa per rebutjar la hipòtesi nul·la relacionada amb la feina. Això suggereix que "Occupation" és significativa en el model.
 
-les dues variables, "Gender" i "Occupation", mostren una associació significativa amb la variable de "Sleep Disorder", segons els p-values baixos.
+Les dues variables, "Gender" i "Occupation", mostren una associació significativa amb la variable de "Sleep Disorder", segons els p-values baixos.
 
 
 **Família binomial**
