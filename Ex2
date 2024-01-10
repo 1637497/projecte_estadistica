@@ -63,26 +63,35 @@ qqline(r)
 #noves dades
 
 # Seleccionar columnas específicas
-cols <- pinguins0[c("species", "sex", "island")]
+cols <- pinguins0[c("sex", "island", "species")]
 
-# Fijar la semilla para reproducibilidad
-set.seed(15)
+set.seed(27)
 
-# Seleccionar 50 filas aleatorias
 test <- sample(1:nrow(cols), 50, replace = FALSE)
 
-# Crear un nuevo DataFrame con las 50 filas seleccionadas
 test <- cols[test, ]
 
+#test$sex <- factor(test$sex)
+#test$island <- factor(test$island)
+#test$species <- factor(test$species)
+
+# Convertir els factors a numèrics
+#test$sex <- as.numeric(test$sex == "female")
+#test$island <- as.numeric(factor(test$island, levels = unique(test$island)))
+#test$species <- as.numeric(factor(test$species, levels = unique(test$species)))
+
 # Mostrar el conjunto de datos con variables numéricas
-print(test)
+sexetest=test$sex
+sexetest=as.numeric(sexetest == "female")
+
 #predicció
 pred <- predict(regr, newdata = test, type = "response")
 
 pred_bin <- ifelse(pred > 0.5, 1, 0)
 
+
 #precisio
-prec <- sum(pred_bin == sexe) / length(sexe)
+prec <- sum(predp_bin == sexetest) / length(test$sex)
 
 print(prec)
 
@@ -110,32 +119,13 @@ qqline(rp)
 
 #Prediccions
 
-#noves dades
-
-
-# Seleccionar columnas específicas
-cols <- pinguins0[c("species", "sex", "island")]
-
-# Fijar la semilla para reproducibilidad
-set.seed(27)
-
-# Seleccionar 50 filas aleatorias
-test <- sample(1:nrow(cols), 50, replace = FALSE)
-
-# Crear un nuevo DataFrame con las 50 filas seleccionadas
-test <- cols[test, ]
-
-# Mostrar el conjunto de datos con variables numéricas
-print(test)
-
-
 #predicció
 predp <- predict(poiss, newdata = test, type = "response")
 
 predp_bin <- ifelse(predp > 0.5, 1, 0)
 
 #precisio
-precp <- sum(predp_bin == sexe) / length(sexe)
+precp <- sum(predp_bin == sexetest) / length(test$sex)
 
 print(precp)
 
