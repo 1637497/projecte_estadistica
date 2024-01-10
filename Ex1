@@ -23,7 +23,7 @@ pinguins <- cols[valors_seed, ]
 
 
 especies <- pinguins$species
-especies <- as.numeric(especies == "Adelie")
+especies <- as.numeric(factor(especies, levels = unique(especies)))
 bec_llargada <- pinguins$bill_length_mm
 bec_profunditat <- pinguins$bill_depth_mm
 aleta_llargada <- pinguins$flipper_length_mm
