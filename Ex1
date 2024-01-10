@@ -13,7 +13,7 @@ cols <- salut0[c("Gender", "Age", "Occupation", "Sleep.Duration", "Quality.of.Sl
 # Fijar la semilla para reproducibilidad
 set.seed(102)
 
-# Seleccionar 50 filas aleatorias
+# Seleccionar 50 filas aleatòries
 valors_seed <- sample(1:nrow(cols), 50, replace = FALSE)
 
 # Crear un nuevo DataFrame con las 50 filas seleccionadas
@@ -36,70 +36,6 @@ pres <- salut$Blood.Pressure
 pres <- as.numeric(factor(pres, levels = unique(pres)))
 calitat <- salut$Quality.of.Sleep
 
-
-#Gràfica Sexes
-barplot(
-  table(pinguins$sex), 
-  col = c("blue", "red"), 
-  main = "Distribució de Sexes", 
-  xlab = "Sexe", 
-  ylab = "Frequència",
-  beside = TRUE,
-)
-
-#Gràfica Espècies
-barplot(
-  table(pinguins$species), 
-  col = c("green", "red",'blue'), 
-  main = "Distribució d'Espècies", 
-  xlab = "Espècie", 
-  ylab = "Frequència",
-  beside = TRUE,
-)
-
-#Gràfica Massa
-barplot(table(pinguins$body_mass_g), col = "skyblue", main = "Distribució Masses corporals", xlab = "Massa corporal", ylab = "Frequència", las = 2)
-
-#Gràfica Aleta
-barplot(table(aleta_allargada), col = "skyblue", main = "Distribució Llargades de l'aleta", xlab = "LLargada", ylab = "Frequència", las = 2)
-
-#Gràfica Bec
-barplot(table(bec_llargada), col = "skyblue", main = "Distribució Llargades del bec", xlab = "LLargada", ylab = "Frequència", las = 2)
-
-
-#aleta_llargada~sexe
-boxplot(aleta_llargada~sexe,
-        data=smokers,
-        main="aleta_llargada~sexe",
-        xlab="aleta_llargada",
-        ylab="sexe",
-        col="yellow",
-        border="black"
-)
-
-#bec_llargada~sexe
-boxplot(aleta_llargada~sexe,
-        data=smokers,
-        main="bec_llargada~sexe",
-        xlab="bec_llargada",
-        ylab="sexe",
-        col="yellow",
-        border="black"
-)
-
-
-#Gràfica Illes
-barplot(table(illa), col = "green", main = "Distribució d'illes", xlab = "Illa", ylab = "Frequència", las = 2)
-
-#Correlació massa aleta
-plot(massa_corporal, aleta_llargada, pch = 25, col = "green", xlab = "massa_corporal", ylab = "aleta_llargada")
-abline(lm(aleta_llargada ~ massa_corporal), col = "red", lwd = 5)
-legend("topleft", paste("Correlació:", round(cor(massa_corporal, aleta_llargada), 2)))
-
-#Correlació massa bec
-plot(massa_corporal, bec_llargada, pch = 25, col = "green", xlab = "massa_corporal", ylab = "aleta_llargada")
-abline(lm(bec_llargada ~ massa_corporal), col = "red", lwd = 5)
-legend("topleft", paste("Correlació:", round(cor(massa_corporal, bec_llargada), 2)))
 
 
 #Fem el model
